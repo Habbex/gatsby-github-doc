@@ -19,7 +19,7 @@ const Layout = ({ children }) => {
   const classes = useStyles();
   return (
     <div className={classes.root}>
-      <Container>
+      <Container maxWidth="md">
         <Grid container spacing={2} direction="column">
           <Paper className={classes.paper} elevation={3}>
               {children}

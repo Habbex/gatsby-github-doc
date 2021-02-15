@@ -35,6 +35,11 @@ export const login= ()=>{
     auth.authorize();
 }
 
+export const logout=()=>{
+    localStorage.setItem("isLoggedIn",false);
+    auth.logout();
+}
+
 const setSession=(cb=()=>{})=>(err, authResult)=>{
     if(err){
         navigate("/")

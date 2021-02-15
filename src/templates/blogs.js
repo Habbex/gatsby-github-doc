@@ -3,10 +3,10 @@ import PropTypes from "prop-types"
 import { Link, graphql } from "gatsby"
 import Img from "gatsby-image"
 import Layout from "../components/layout"
-import { Grid, InputBase, IconButton } from '@material-ui/core';
+import { Grid, OutlinedInput, FormControl, InputAdornment } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import { makeStyles } from '@material-ui/core/styles';
-import { login, isAuthenticated, getProfile } from "../utils/auth";
+import { login, logout, isAuthenticated, getProfile } from "../utils/auth";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -18,9 +18,6 @@ const useStyles = makeStyles((theme) => ({
   input: {
     marginLeft: theme.spacing(1),
     flex: 1,
-  },
-  iconButton: {
-    padding: 10,
   },
   divider: {
     height: 28,
@@ -68,44 +65,61 @@ const BlogIndex = ({ data, pageContext }) => {
   const user = getProfile()
   return (
     <Layout>
-      <h1 style={{ textAlign: `center` }}>Hello {user.name}</h1>
       <div>
-        <Grid item xs={12}>
-          <InputBase
-            className={classes.input}
-            placeholder="Search posts"
-            inputProps={{ 'aria-label': 'search posts' }}
-            onChange={handleInputChange}
-          />
-          <IconButton type="submit" className={classes.iconButton} aria-label="search">
-            <SearchIcon />
-          </IconButton>
+        <Grid container justify="center">
+          <Grid item>
+          <h1 style={{ textAlign: `center` }}>Hello {user.name}</h1>
+      <a
+        href="#logout"
+        onClick={e => {
+          logout()
+          e.preventDefault()
+        }}
+      >
+        Log Out
+        </a>
+            <FormControl fullWidth>
+              <OutlinedInput
+                className={classes.input}
+                placeholder="Search posts"
+                inputProps={{ 'aria-label': 'search posts' }}
+                onChange={handleInputChange}
+                endAdornment={<InputAdornment position="end"><SearchIcon /></InputAdornment>}
+              />
+            </FormControl>
+          </Grid>
         </Grid>
       </div>
-      {posts.map(({ node }) => {
-        const { excerpt } = node
-        const { slug } = node.fields
-        const { title, date, description, featuredImage, featuredImgAlt } = node.frontmatter
-        return (
-          <article key={slug}>
-            <header>
-              <h2>
-                <Link to={slug}>{title}</Link>
-              </h2>
-              <Img src={featuredImage} alt={featuredImgAlt} />
-              <p>{date}</p>
-            </header>
-            <section>
-              <p
-                dangerouslySetInnerHTML={{
-                  __html: description || excerpt,
-                }}
-              />
-            </section>
-            <hr />
-          </article>
-        )
-      })}
+      <div>
+        <Grid container justify="center">
+          <Grid item md={8}>
+            {posts.map(({ node }) => {
+              const { excerpt } = node
+              const { slug } = node.fields
+              const { title, date, description, featuredImage, featuredImgAlt } = node.frontmatter
+              return (
+                <article key={slug}>
+                  <header>
+                    <h2>
+                      <Link to={slug}>{title}</Link>
+                    </h2>
+                    <Img fluid={featuredImage.childImageSharp.fluid} alt={featuredImgAlt} />
+                    <p>{date}</p>
+                  </header>
+                  <section>
+                    <p
+                      dangerouslySetInnerHTML={{
+                        __html: description || excerpt,
+                      }}
+                    />
+                  </section>
+                  <hr />
+                </article>
+              )
+            })}
+          </Grid>
+        </Grid>
+      </div>
     </Layout>
   )
 }
@@ -125,7 +139,13 @@ query {
           title
           date(formatString: "MMMM DD, YYYY")
           shortdescription
-          featuredImage
+          featuredImage {
+            childImageSharp {
+              fluid{
+                ...GatsbyImageSharpFluid
+              }
+            }
+          }
           featuredImgAlt
         }
         fields {

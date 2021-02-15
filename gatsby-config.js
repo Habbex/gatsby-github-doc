@@ -56,7 +56,8 @@ module.exports = {
         remote: `https://github.com/Habbex/ehabokal.git`,
         branch: `master`,
         // Only import the docs folder from a codebase.
-        patterns: [`src/**/*.{md, jpg, png}`]
+        // patterns: [`src/**/*.{md, jpg, png}`]
+        patterns: [`src/**`]
       }
     },
     // this (optional) plugin enables Progressive Web App + Offline functionality

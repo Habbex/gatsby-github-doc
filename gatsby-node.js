@@ -6,18 +6,18 @@
 
 // You can delete this file if you're not using it
 const path = require("path");
-// const {paginate}= require('gatsby-awesome-pagination');
+const {paginate}= require('gatsby-awesome-pagination');
 const { createFilePath } = require(`gatsby-source-filesystem`)
-module.exports.onCreateNode = ({ node,getNode, actions }) => {
-    const { createNodeField } = actions
-    if (node.internal.type === "MarkdownRemark") {
-        const slug = createFilePath({ node, getNode, basePath: `posts` })
-        createNodeField({
-            node,
-            name: "slug",
-            value: slug,
-        })
-    }
+module.exports.onCreateNode = ({ node, actions }) => {
+  const { createNodeField } = actions
+  if (node.internal.type === "MarkdownRemark") {
+    const slug = path.basename(node.fileAbsolutePath, ".md")
+    createNodeField({
+      node,
+      name: "slug",
+      value: slug,
+    })
+  }
 }
 
 module.exports.createPages = async ({ graphql, actions }) => {
@@ -38,13 +38,13 @@ module.exports.createPages = async ({ graphql, actions }) => {
       }
     `)
 
-    // paginate ({
-    //   createPage,
-    //   items: respone.data.allMarkdownRemark.edges,
-    //   itemsPerPage: 2,
-    //   pathPrefix: '/blogs',
-    //   component: blogListTemplate
-    // });
+    paginate ({
+      createPage,
+      items: respone.data.allMarkdownRemark.edges,
+      itemsPerPage: 2,
+      pathPrefix: '/blogs',
+      component: blogListTemplate
+    });
 
 
     respone.data.allMarkdownRemark.edges.forEach((edge) => {
