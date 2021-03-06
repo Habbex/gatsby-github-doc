@@ -3,26 +3,35 @@ import PropTypes from "prop-types"
 import { Link, graphql } from "gatsby"
 import Img from "gatsby-image"
 import Layout from "../components/layout"
-import { Grid, OutlinedInput, FormControl, InputAdornment } from '@material-ui/core';
+import { Grid, OutlinedInput, FormControl, InputAdornment, Card, CardActionArea, CardActions, CardContent, CardMedia, Typography } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import { makeStyles } from '@material-ui/core/styles';
-import { login, logout, isAuthenticated, getProfile } from "../utils/auth";
+import { logout, getProfile } from "../utils/auth";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    padding: '2px 4px',
-    display: 'flex',
-    alignItems: 'center',
-    width: 400,
+    flexGrow: 1,
   },
   input: {
-    marginLeft: theme.spacing(1),
+    margin: theme.spacing(1),
+    padding: '2px 0px',
     flex: 1,
   },
   divider: {
     height: 28,
     margin: 4,
   },
+  paper: {
+    padding: theme.spacing(3),
+  },
+  link:{
+    textAlign: 'center',
+    textDecoration: 'none',
+    color: theme.palette.text.secondary,
+  },
+  image:{
+    maxHeight:'60vh'
+  }
 }));
 
 
@@ -41,10 +50,11 @@ const BlogIndex = ({ data, pageContext }) => {
 
     const filteredData = posts.filter(post => {
       const { title } = post.node.frontmatter
-      const { excerpt } = post.node
+      const { excerpt, html } = post.node
       return (
         excerpt.toLowerCase().includes(query.toLowerCase()) ||
-        title.toLowerCase().includes(query.toLowerCase())
+        title.toLowerCase().includes(query.toLowerCase()) ||
+        html.toLowerCase().includes(query.toLowerCase())
       )
     })
     setState({
@@ -58,25 +68,22 @@ const BlogIndex = ({ data, pageContext }) => {
   const posts = hasSearchResults ? filteredData : allPosts
   const classes = useStyles();
 
-  if (!isAuthenticated()) {
-    login()
-    return <p>Redirecting to login...</p>
-  }
+
   const user = getProfile()
   return (
     <Layout>
       <div>
         <Grid container justify="center">
           <Grid item>
-          <h1 style={{ textAlign: `center` }}>Hello {user.name}</h1>
-      <a
-        href="#logout"
-        onClick={e => {
-          logout()
-          e.preventDefault()
-        }}
-      >
-        Log Out
+            <h1 style={{ textAlign: `center` }}>Hello {user.name}</h1>
+            <a
+              href="#logout"
+              onClick={e => {
+                logout()
+                e.preventDefault()
+              }}
+            >
+              Log Out
         </a>
             <FormControl fullWidth>
               <OutlinedInput
@@ -92,35 +99,37 @@ const BlogIndex = ({ data, pageContext }) => {
       </div>
       <div>
         <Grid container justify="center">
-          <Grid item md={8}>
-            {posts.map(({ node }) => {
-              const { excerpt } = node
-              const { slug } = node.fields
-              const { title, date, description, featuredImage, featuredImgAlt } = node.frontmatter
-              return (
-                <article key={slug}>
-                  <header>
-                    <h2>
-                      <Link to={slug}>{title}</Link>
-                    </h2>
-                    <Img fluid={featuredImage.childImageSharp.fluid} alt={featuredImgAlt} />
-                    <p>{date}</p>
-                  </header>
-                  <section>
-                    <p
-                      dangerouslySetInnerHTML={{
-                        __html: description || excerpt,
-                      }}
-                    />
-                  </section>
-                  <hr />
-                </article>
-              )
-            })}
-          </Grid>
+          {posts.map(({ node }) => {
+            const { excerpt } = node
+            const { slug } = node.fields
+            const { title, date, description, featuredImage, featuredImgAlt } = node.frontmatter
+            return (
+              <Grid item md={10} className={classes.paper}>
+                <Link className={classes.link} to={slug}>
+                  <Card key={slug}>
+                    <CardActionArea>
+                      <Img className={classes.image} fluid={featuredImage.childImageSharp.fluid} alt={featuredImgAlt} />
+                      <CardContent>
+                        <Typography gutterBottom variant="h5" component="h2">
+                          {title}
+                        </Typography>
+                        <Typography gutterBottom variant="body1" component="p" dangerouslySetInnerHTML={{
+                          __html: description || excerpt,
+                        }}>
+                        </Typography>
+                        <Typography variant="body1" color="textSecondary" component="p">
+                          {date}
+                        </Typography>
+                      </CardContent>
+                    </CardActionArea>
+                  </Card>
+                </Link>
+              </Grid>
+            )}
+          )}
         </Grid>
-      </div>
-    </Layout>
+      </div >
+    </Layout >
   )
 }
 
@@ -130,10 +139,10 @@ BlogIndex.propType = {
 
 export const pageQuery = graphql`
 query {
-  allMarkdownRemark(sort: { order: DESC, fields: frontmatter___date }) {
+  allMarkdownRemark(sort: {order: DESC, fields: frontmatter___date}) {
     edges {
       node {
-        excerpt(pruneLength: 200)
+        excerpt(pruneLength: 500)
         id
         frontmatter {
           title
@@ -141,7 +150,7 @@ query {
           shortdescription
           featuredImage {
             childImageSharp {
-              fluid{
+              fluid {
                 ...GatsbyImageSharpFluid
               }
             }
@@ -151,6 +160,7 @@ query {
         fields {
           slug
         }
+        html
       }
     }
   }
