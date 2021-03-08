@@ -3,10 +3,12 @@ import PropTypes from "prop-types"
 import { Link, graphql } from "gatsby"
 import Img from "gatsby-image"
 import Layout from "../components/layout"
-import { Grid, OutlinedInput, FormControl, InputAdornment, Card, CardActionArea, CardActions, CardContent, CardMedia, Typography } from '@material-ui/core';
+import { Grid, OutlinedInput, FormControl, InputAdornment, Card, CardActionArea, CardContent, Typography } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import { makeStyles } from '@material-ui/core/styles';
 import { logout, getProfile } from "../utils/auth";
+import Pagination from "../components/pagination"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -22,15 +24,15 @@ const useStyles = makeStyles((theme) => ({
     margin: 4,
   },
   paper: {
-    padding: theme.spacing(3),
+    padding: theme.spacing(4),
   },
-  link:{
+  link: {
     textAlign: 'center',
     textDecoration: 'none',
     color: theme.palette.text.secondary,
   },
-  image:{
-    maxHeight:'60vh'
+  image: {
+    maxHeight: '60vh'
   }
 }));
 
@@ -73,27 +75,42 @@ const BlogIndex = ({ data, pageContext }) => {
   return (
     <Layout>
       <div>
-        <Grid container justify="center">
-          <Grid item>
-            <h1 style={{ textAlign: `center` }}>Hello {user.name}</h1>
-            <a
-              href="#logout"
-              onClick={e => {
-                logout()
-                e.preventDefault()
-              }}
-            >
-              Log Out
-        </a>
-            <FormControl fullWidth>
-              <OutlinedInput
-                className={classes.input}
-                placeholder="Search posts"
-                inputProps={{ 'aria-label': 'search posts' }}
-                onChange={handleInputChange}
-                endAdornment={<InputAdornment position="end"><SearchIcon /></InputAdornment>}
-              />
-            </FormControl>
+        <Grid container justify="center" direction="column">
+          <Grid container item xs={12}>
+            <Grid item xs={2} />
+            <Grid item xs={8}>
+              <h1 style={{ textAlign: `center` }}>Hello {user.name}</h1>
+            </Grid>
+            <Grid item xs={2}>
+              <Grid container direction="row" alignItems="center" justify="space-around">
+                <a
+                  href="#logout"
+                  onClick={e => {
+                    logout()
+                    e.preventDefault()
+                  }}
+                >
+                  Log Out
+                  </a>
+                <ExitToAppIcon />
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid container item xs={12} justify="center">
+            <Grid item xs={8}>
+              <FormControl fullWidth>
+                <OutlinedInput
+                  className={classes.input}
+                  placeholder="Search posts"
+                  inputProps={{ 'aria-label': 'search posts' }}
+                  onChange={handleInputChange}
+                  endAdornment={<InputAdornment position="end"><SearchIcon /></InputAdornment>}
+                />
+              </FormControl>
+            </Grid>
+            <Grid item xs={8} justify="center">
+              <Pagination pageContext={pageContext} />
+            </Grid>
           </Grid>
         </Grid>
       </div>
@@ -104,9 +121,9 @@ const BlogIndex = ({ data, pageContext }) => {
             const { slug } = node.fields
             const { title, date, description, featuredImage, featuredImgAlt } = node.frontmatter
             return (
-              <Grid item md={10} className={classes.paper}>
-                <Link className={classes.link} to={slug}>
-                  <Card key={slug}>
+              <Grid item xs={10} key={slug} className={classes.paper}>
+                <Link className={classes.link} to={`/blogs/${slug}`}>
+                  <Card >
                     <CardActionArea>
                       <Img className={classes.image} fluid={featuredImage.childImageSharp.fluid} alt={featuredImgAlt} />
                       <CardContent>
@@ -125,7 +142,8 @@ const BlogIndex = ({ data, pageContext }) => {
                   </Card>
                 </Link>
               </Grid>
-            )}
+            )
+          }
           )}
         </Grid>
       </div >
@@ -135,11 +153,16 @@ const BlogIndex = ({ data, pageContext }) => {
 
 BlogIndex.propType = {
   data: PropTypes.object.isRequired,
+  pageContext: PropTypes.object.isRequired
 }
 
 export const pageQuery = graphql`
-query {
-  allMarkdownRemark(sort: {order: DESC, fields: frontmatter___date}) {
+query ($skip: Int!, $limit: Int!){
+  allMarkdownRemark(
+    sort: { fields: [frontmatter___date], order: DESC }
+    limit: $limit
+    skip: $skip
+  ) {
     edges {
       node {
         excerpt(pruneLength: 500)

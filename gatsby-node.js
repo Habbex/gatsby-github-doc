@@ -7,7 +7,8 @@
 // You can delete this file if you're not using it
 const path = require("path");
 const {paginate}= require('gatsby-awesome-pagination');
-const { createFilePath } = require(`gatsby-source-filesystem`)
+const { Reporter } = require("gatsby");
+
 module.exports.onCreateNode = ({ node, actions }) => {
   const { createNodeField } = actions
   if (node.internal.type === "MarkdownRemark") {
@@ -37,6 +38,11 @@ module.exports.createPages = async ({ graphql, actions }) => {
         }
       }
     `)
+
+    if(respone.errors){
+      reporter.panicOnBuild(`Error while running GraphQL query`);
+      return;
+    }
 
     paginate ({
       createPage,

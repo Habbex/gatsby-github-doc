@@ -5,11 +5,10 @@ import { Router } from "@reach/router"
 
 const Home= ()=>{};
 const IndexPage = () => {
-    if (!isAuthenticated()) {
-        login()
-        return <p>Redirecting to login...</p>
-      }
-
+    // if (!isAuthenticated()) {
+    //     login()
+    //     return <p>Redirecting to login...</p>
+    //   }
       return(
           <>
           <Layout>

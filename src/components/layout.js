@@ -9,11 +9,11 @@ const Layout = ({ children }) => {
   const useStyles = makeStyles((theme) => ({
     root: {
       display: "flex",
-      padding: theme.spacing(8, 0, 6),
+      padding: theme.spacing(2),
     },
     paper: {
       margin: theme.spacing(2),
-      padding: theme.spacing(2),
+      padding: theme.spacing(4),
     },
   }));
   const classes = useStyles();
