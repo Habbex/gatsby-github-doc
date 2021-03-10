@@ -7,7 +7,6 @@
 // You can delete this file if you're not using it
 const path = require("path");
 const {paginate}= require('gatsby-awesome-pagination');
-const { Reporter } = require("gatsby");
 
 module.exports.onCreateNode = ({ node, actions }) => {
   const { createNodeField } = actions

@@ -22,7 +22,7 @@ const Pagination = ({ pageContext }) => {
                         </Link>
                     )}
                 </Grid>
-                <Grid xs={8} />
+                <Grid item xs={8} />
                 <Grid item xs={2}>
                     {nextPagePath && (
                         <Link to={nextPagePath}>

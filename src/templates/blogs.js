@@ -1,14 +1,15 @@
-import React, { useState } from "react"
+import React from "react"
 import PropTypes from "prop-types"
 import { Link, graphql } from "gatsby"
 import Img from "gatsby-image"
 import Layout from "../components/layout"
-import { Grid, OutlinedInput, FormControl, InputAdornment, Card, CardActionArea, CardContent, Typography } from '@material-ui/core';
-import SearchIcon from '@material-ui/icons/Search';
+import { Grid, Card, CardActionArea, CardContent, Typography } from '@material-ui/core';
+
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import { makeStyles } from '@material-ui/core/styles';
 import { logout, getProfile } from "../utils/auth";
 import Pagination from "../components/pagination"
+import Search from '../components/search'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -38,38 +39,9 @@ const useStyles = makeStyles((theme) => ({
 
 
 const BlogIndex = ({ data, pageContext }) => {
-  const allPosts = data.allMarkdownRemark.edges
-  const emptyQuery = ""
-  const [state, setState] = useState({
-    filteredData: [],
-    query: emptyQuery,
-  })
 
-  const handleInputChange = event => {
-    console.log(event.target.value)
-    const query = event.target.value
-    const posts = data.allMarkdownRemark.edges || []
-
-    const filteredData = posts.filter(post => {
-      const { title } = post.node.frontmatter
-      const { excerpt, html } = post.node
-      return (
-        excerpt.toLowerCase().includes(query.toLowerCase()) ||
-        title.toLowerCase().includes(query.toLowerCase()) ||
-        html.toLowerCase().includes(query.toLowerCase())
-      )
-    })
-    setState({
-      query,
-      filteredData,
-    })
-  }
-
-  const { filteredData, query } = state
-  const hasSearchResults = filteredData && query !== emptyQuery
-  const posts = hasSearchResults ? filteredData : allPosts
+  const posts = data.allMarkdownRemark.edges
   const classes = useStyles();
-
 
   const user = getProfile()
   return (
@@ -97,18 +69,8 @@ const BlogIndex = ({ data, pageContext }) => {
             </Grid>
           </Grid>
           <Grid container item xs={12} justify="center">
-            <Grid item xs={8}>
-              <FormControl fullWidth>
-                <OutlinedInput
-                  className={classes.input}
-                  placeholder="Search posts"
-                  inputProps={{ 'aria-label': 'search posts' }}
-                  onChange={handleInputChange}
-                  endAdornment={<InputAdornment position="end"><SearchIcon /></InputAdornment>}
-                />
-              </FormControl>
-            </Grid>
-            <Grid item xs={8} justify="center">
+            <Search />
+            <Grid  item xs={8}>
               <Pagination pageContext={pageContext} />
             </Grid>
           </Grid>
