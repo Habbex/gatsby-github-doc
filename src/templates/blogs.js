@@ -15,15 +15,6 @@ const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
   },
-  input: {
-    margin: theme.spacing(1),
-    padding: '2px 0px',
-    flex: 1,
-  },
-  divider: {
-    height: 28,
-    margin: 4,
-  },
   paper: {
     padding: theme.spacing(4),
   },
@@ -70,12 +61,10 @@ const BlogIndex = ({ data, pageContext }) => {
           </Grid>
           <Grid container item xs={12} justify="center">
             <Search />
-            <Grid  item xs={8}>
-              <Pagination pageContext={pageContext} />
-            </Grid>
           </Grid>
         </Grid>
       </div>
+      <Pagination pageContext={pageContext} />
       <div>
         <Grid container justify="center">
           {posts.map(({ node }) => {
@@ -109,6 +98,7 @@ const BlogIndex = ({ data, pageContext }) => {
           )}
         </Grid>
       </div >
+      <Pagination pageContext={pageContext} />
     </Layout >
   )
 }

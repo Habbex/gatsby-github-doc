@@ -46,7 +46,7 @@ module.exports.createPages = async ({ graphql, actions }) => {
     paginate ({
       createPage,
       items: respone.data.allMarkdownRemark.edges,
-      itemsPerPage: 2,
+      itemsPerPage: 5,
       pathPrefix: '/blogs',
       component: blogListTemplate
     });
